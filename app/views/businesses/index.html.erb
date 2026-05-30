@@ -1,7 +1,7 @@
 <div class="container mt-5">
   <div class="mb-5">
     <h1 class="text-white fw-bold display-5">🏪 Explorar Tiendas</h1>
-    <p class="text-muted">Encuentra tus locales favoritos y revisa su menú al instante.</p>
+    <p class="text-white">Encuentra tus locales favoritos y revisa su menú al instante.</p>
   </div>
 
   <div class="row">
@@ -18,23 +18,23 @@
               <span class="badge bg-warning text-dark me-2 font-monospace text-uppercase">
                 <%= business.category.presence || "Comida" %>
               </span>
-              <span class="text-muted small">📍 <%= business.comuna %></span>
+              <span class="text-white small">📍 <%= business.comuna %></span>
             </div>
 
             <hr class="border-secondary my-3">
 
             <div class="flex-grow-1 mb-4">
-              <h6 class="text-muted text-uppercase small fw-bold mb-2">Menú destacado:</h6>
+              <h6 class="text-white text-uppercase small fw-bold mb-2">Menú destacado:</h6>
               <% if business.items.any? %>
                 <ul class="list-unstyled mb-0">
                   <% business.items.limit(3).each do |item| %>
                     <li class="text-light small mb-1">
-                      ✨ <%= item.name %> <span class="text-muted">(<%= item.cost %>)</span>
+                      ✨ <%= item.name %> <span class="text-white">(<%= item.cost %>)</span>
                     </li>
                   <% end %>
                 </ul>
               <% else %>
-                <p class="text-muted small italic mb-0">Sin productos cargados aún.</p>
+                <p class="text-white small italic mb-0">Sin productos cargados aún.</p>
               <% end %>
             </div>
 
