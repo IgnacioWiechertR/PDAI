@@ -1,0 +1,47 @@
+<div class="card bg-dark text-white border-secondary shadow p-4">
+  <%= form_with(model: item) do |f| %>
+    
+    <% if item.errors.any? %>
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          <% item.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mb-3">
+      <%= f.label :photo, "Foto del Producto", class: "form-label text-warning fw-bold" %>
+      <%= f.file_field :photo, class: "form-control bg-secondary text-white border-0" %>
+      <div class="form-text text-muted">Sube una imagen provocativa para tus clientes.</div>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :name, "Nombre del Plato / Producto", class: "form-label fw-bold" %>
+      <%= f.text_field :name, class: "form-control", placeholder: "Ej: Pizza Pepperoni Gourmet" %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :description, "Descripción", class: "form-label fw-bold" %>
+      <%= f.text_area :description, class: "form-control", rows: 3, placeholder: "¿Qué contiene este producto?" %>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <%= f.label :cost, "Precio ($)", class: "form-label fw-bold" %>
+        <%= f.number_field :cost, class: "form-control", placeholder: "0.00" %>
+      </div>
+      <div class="col-md-6 mb-3">
+        <%= f.label :categories, "Categoría", class: "form-label fw-bold" %>
+        <%= f.text_field :categories, class: "form-control", placeholder: "Ej: Pizza, Italiana" %>
+      </div>
+    </div>
+
+    <div class="d-grid gap-2 mt-4">
+      <%= f.submit "Guardar Producto", class: "btn btn-warning fw-bold py-2 shadow" %>
+      <%= link_to "Cancelar", items_path, class: "btn btn-outline-light btn-sm" %>
+    </div>
+
+  <% end %>
+</div>

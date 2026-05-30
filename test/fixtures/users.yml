@@ -2,14 +2,14 @@
 
 one:
   username: MyString
+  age: 1
+  comuna: MyString
   email: MyString
-  password: MyString
-  role: MyString
-  badges: 1
+  password_digest: MyString
 
 two:
   username: MyString
+  age: 1
+  comuna: MyString
   email: MyString
-  password: MyString
-  role: MyString
-  badges: 1
+  password_digest: MyString

@@ -1,0 +1,48 @@
+<div class="container mt-5">
+  <div class="mb-5">
+    <h1 class="text-white fw-bold display-5">🏪 Explorar Tiendas</h1>
+    <p class="text-muted">Encuentra tus locales favoritos y revisa su menú al instante.</p>
+  </div>
+
+  <div class="row">
+    <% @businesses.each do |business| %>
+      <div class="col-md-4 mb-4">
+        <div class="card bg-dark text-white border-secondary h-100 shadow d-flex flex-column">
+          <div class="card-body d-flex flex-column p-4">
+            
+            <h3 class="card-title fw-bold text-warning mb-2">
+              <%= business.username %>
+            </h3>
+
+            <div class="mb-3">
+              <span class="badge bg-warning text-dark me-2 font-monospace text-uppercase">
+                <%= business.category.presence || "Comida" %>
+              </span>
+              <span class="text-muted small">📍 <%= business.comuna %></span>
+            </div>
+
+            <hr class="border-secondary my-3">
+
+            <div class="flex-grow-1 mb-4">
+              <h6 class="text-muted text-uppercase small fw-bold mb-2">Menú destacado:</h6>
+              <% if business.items.any? %>
+                <ul class="list-unstyled mb-0">
+                  <% business.items.limit(3).each do |item| %>
+                    <li class="text-light small mb-1">
+                      ✨ <%= item.name %> <span class="text-muted">(<%= item.cost %>)</span>
+                    </li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <p class="text-muted small italic mb-0">Sin productos cargados aún.</p>
+              <% end %>
+            </div>
+
+            <%= link_to "Ver Menú ➡️", business_path(business), class: "btn btn-outline-warning w-100 fw-bold mt-auto py-2 shadow-sm" %>
+            
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

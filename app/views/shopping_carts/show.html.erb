@@ -1,0 +1,69 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white fw-bold">🛒 Tu Carrito de Compras</h2>
+        
+        <% if @shopping_cart.items.any? %>
+          <%= link_to "Vaciar Carrito 🗑️", empty_shopping_cart_path(@shopping_cart), 
+                      data: { turbo_method: :delete, turbo_confirm: "¿Seguro que quieres vaciar todo tu carrito?" }, 
+                      class: "btn btn-outline-danger btn-sm fw-bold" %>
+        <% end %>
+      </div>
+
+      <% if @shopping_cart.items.any? %>
+        <div class="card bg-dark text-white border-warning shadow mb-4">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-dark table-hover align-middle mb-0">
+                <thead>
+                  <tr class="text-warning">
+                    <th scope="col" class="ps-4">Producto</th>
+                    <th scope="col">Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @shopping_cart.items.each do |item| %>
+                    <tr>
+                      <td class="ps-4">
+                        <div class="fw-bold text-white"><%= item.name %></div>
+                        <small class="text-muted">De: <%= item.owner&.username || "Tienda" %></small>
+                      </td>
+                      <td class="fw-bold">$<%= item.cost %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-secondary text-white border-0 shadow p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fs-4">Total a pagar:</span>
+            <span class="fs-2 fw-bold text-warning">$<%= @shopping_cart.items.sum(:cost) %></span>
+          </div>
+          <div class="d-grid gap-2">
+            <%= link_to "Proceder al Pago 💳", "#", class: "btn btn-warning btn-lg fw-bold shadow" %>
+          </div>
+        </div>
+
+      <% else %>
+        <div class="card bg-dark text-white border-secondary text-center p-5 shadow">
+          <div class="card-body">
+            <div class="fs-1 text-muted mb-3">🛍️</div>
+            <h4 class="fw-bold mb-2">Tu carrito está vacío</h4>
+            <p class="text-muted mb-4">¿Antojo de algo? Explora las tiendas disponibles y agrega tus productos favoritos.</p>
+            <%= link_to "Ver Tiendas Disponibles", businesses_path, class: "btn btn-warning fw-bold px-4" %>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="mt-4">
+        <%= link_to "← Volver al Inicio", root_path, class: "text-muted text-decoration-none" %>
+      </div>
+
+    </div>
+  </div>
+</div>

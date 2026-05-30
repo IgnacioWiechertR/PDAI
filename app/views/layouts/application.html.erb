@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Assignment" %></title>
+    <title><%= content_for(:title) || "Mi E-Commerce" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -21,52 +21,64 @@
   <body class="bg-dark text-white"> 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <%= link_to "Fitness Tracker", root_path, class: "navbar-brand fw-bold" %>
+        <%= link_to "Mi E-Commerce", root_path, class: "navbar-brand fw-bold" %>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <%= link_to "Challenges", challenges_path, class: "nav-link" %>
-            </li>
-            <li class="nav-item">
-              <%= link_to "Progresses", progresses_path, class: "nav-link" %>
-            </li>
-            <li class="nav-item">
-              <%= link_to "Users", users_path, class: "nav-link" %>
-            </li>
-          </ul>
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
 
           <ul class="navbar-nav">
             <% if user_signed_in? %>
               <li class="nav-item d-flex align-items-center">
-                <span class="navbar-text me-3">Signed in as <%= current_user.email %></span>
+                <span class="navbar-text me-3">Bienvenido, <%= current_user.username %>!</span>
+              </li>
+              <% if current_user.shopping_cart.present? %>
+                <li class="nav-item">
+                  <%= link_to "Ver carrito", shopping_cart_path(current_user.shopping_cart), class: "nav-link text-warning fw-bold" %>
+                </li>
+              <% end %>
+              <li class="nav-item">
+                <%= link_to "Salir", destroy_user_session_path, data: { turbo_method: :delete }, class: "nav-link" %>
+              </li>
+              
+            <% elsif business_signed_in? %>
+              <li class="nav-item d-flex align-items-center">
+                <%= link_to business_path(current_business), class: "nav-link text-warning me-3 fw-bold text-decoration-none" do %>
+                  🏪 Bienvenido, <%= current_business.username || current_business.email %>!
+                <% end %>
               </li>
               <li class="nav-item">
-                <%= link_to "Sign out", destroy_user_session_path, data: { turbo_method: :delete }, class: "nav-link" %>
+                <%= link_to "Mis Ítems", items_path, class: "nav-link" %>
               </li>
+              <li class="nav-item">
+                <%= link_to "Salir", destroy_business_session_path, data: { turbo_method: :delete }, class: "nav-link text-danger" %>
+              </li>
+
             <% else %>
               <li class="nav-item">
-                <%= link_to "Sign in", new_user_session_path, class: "nav-link" %>
+                <%= link_to "Eres nuevo? Registrate!", opciones_registro_path, class: "nav-link text-warning fw-bold" %>
               </li>
               <li class="nav-item">
-                <%= link_to "Sign up", new_user_registration_path, class: "nav-link" %>
+                <%= link_to "Ya tengo cuenta", new_user_session_path, class: "nav-link" %>
+              </li>
+              <li class="nav-item">
+                <%= link_to "Login Negocio", new_business_session_path, class: "nav-link text-warning" %>
               </li>
             <% end %>
           </ul>
           </div>
       </div>
     </nav>
+
     <div class="container mt-4">
     <% flash.each do |key, message| %>
       <div class="alert <%= key == 'notice' ? 'alert-success' : 'alert-danger' %>" role="alert">
         <%= message %>
       </div>
     <% end %>
-
     </div>
 
     <%= yield %>

@@ -1,4 +1,4 @@
 class PagesController < ApplicationController
-  def index
+  def registro
   end
 end

@@ -1,0 +1,30 @@
+<div class="container mt-5">
+  <div class="row justify-content-center text-center">
+    <h2 class="mb-5 fw-bold text-white">¿Cómo te gustaría registrarte?</h2>
+
+    <div class="col-md-5 mb-4">
+      <%= link_to new_user_registration_path, class: "text-decoration-none" do %>
+        <div class="card bg-secondary text-white border-0 shadow h-100 p-4 btn-outline-light">
+          <div class="card-body">
+            <h1 class="display-4 mb-3">👤</h1>
+            <h3 class="card-title fw-bold">Soy un Cliente</h3>
+            <p class="card-text">Quiero explorar negocios, ver menús y hacer compras.</p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="col-md-5 mb-4">
+      <%= link_to new_business_path, class: "text-decoration-none" do %>
+        <div class="card bg-secondary text-white border-0 shadow h-100 p-4 btn-outline-warning">
+          <div class="card-body">
+            <h1 class="display-4 mb-3">🏪</h1>
+            <h3 class="card-title fw-bold text-warning">Soy un Negocio</h3>
+            <p class="card-text text-light">Quiero registrar mi local, subir mis ítems y vender.</p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+</div>

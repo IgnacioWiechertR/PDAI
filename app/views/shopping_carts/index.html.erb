@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Shopping carts" %>
+
+<h1>Shopping carts</h1>
+
+<div id="shopping_carts">
+  <% @shopping_carts.each do |shopping_cart| %>
+    <%= render shopping_cart %>
+    <p>
+      <%= link_to "Show this shopping cart", shopping_cart %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New shopping cart", new_shopping_cart_path %>

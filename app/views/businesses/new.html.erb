@@ -1,0 +1,56 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card bg-dark text-white border-secondary shadow">
+        <div class="card-body p-5">
+          <h2 class="text-center mb-4 fw-bold text-warning">Registro para Negocios</h2>
+
+          <%= form_with(model: @business) do |f| %>
+            
+            <% if f.object.errors.any? %>
+              <div class="alert alert-danger">
+                <strong>Error:</strong> Por favor revisa los siguientes campos:
+                <ul class="mb-0">
+                  <% f.object.errors.full_messages.each do |msg| %>
+                    <li><%= msg %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="mb-3">
+              <%= f.label :username, "Nombre del Negocio", class: "form-label" %>
+              <%= f.text_field :username, class: "form-control" %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :email, "Correo Electrónico", class: "form-label" %>
+              <%= f.email_field :email, class: "form-control" %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :category, "Categoría (ej. Sushi, Italiana, Vegana)", class: "form-label" %>
+              <%= f.text_field :category, class: "form-control" %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :comuna, "Comuna", class: "form-label" %>
+              <%= f.text_field :comuna, class: "form-control" %>
+            </div>
+
+            <div class="mb-4">
+              <%= f.label :password, "Contraseña", class: "form-label" %>
+              <%= f.password_field :password, class: "form-control" %> 
+            </div>
+
+            <div class="d-grid gap-2">
+              <%= f.submit "Crear Negocio", class: "btn btn-warning fw-bold" %>
+              <%= link_to "Volver atrás", root_path, class: "btn btn-outline-light" %>
+            </div>
+          <% end %>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

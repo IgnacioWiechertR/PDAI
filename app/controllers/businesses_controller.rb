@@ -1,0 +1,73 @@
+class BusinessesController < ApplicationController
+  before_action :set_business, only: %i[ show edit update destroy ]
+
+  # GET /businesses or /businesses.json
+  def index
+    @businesses = Business.all
+  end
+
+  # GET /businesses/1 or /businesses/1.json
+  def show
+  end
+
+  # GET /businesses/new
+  def new
+    @business = Business.new
+  end
+
+  # GET /businesses/1/edit
+  def edit
+  end
+
+  # POST /businesses or /businesses.json
+  def create
+    @business = Business.new(business_params)
+
+    respond_to do |format|
+      if @business.save
+        # ¡ESTA ES LA LÍNEA MÁGICA DE DEVISE!
+        sign_in(@business)
+        
+        format.html { redirect_to root_path, notice: "¡Negocio registrado y sesión iniciada con éxito!" }
+        format.json { render :show, status: :created, location: @business }
+      else
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: @business.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # PATCH/PUT /businesses/1 or /businesses/1.json
+  def update
+    respond_to do |format|
+      if @business.update(business_params)
+        format.html { redirect_to @business, notice: "Business was successfully updated.", status: :see_other }
+        format.json { render :show, status: :ok, location: @business }
+      else
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: @business.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /businesses/1 or /businesses/1.json
+  def destroy
+    @business.destroy!
+
+    respond_to do |format|
+      format.html { redirect_to businesses_path, notice: "Business was successfully destroyed.", status: :see_other }
+      format.json { head :no_content }
+    end
+  end
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_business
+      @business = Business.find(params.expect(:id))
+    end
+
+    # Only allow a list of trusted parameters through.
+    def business_params
+      params.require(:business).permit(:username, :comuna, :email, :password, :category)
+    end
+end

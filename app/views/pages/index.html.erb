@@ -1,33 +1,31 @@
-<div class="bg-dark text-white">
-  
-  <div class="d-flex justify-content-center align-items-center">
+<div class="bg-dark text-white min-vh-100 d-flex justify-content-center align-items-center">
+
+  <div class="text-center">
     
-    <%= image_tag "Left.jpeg", class: "d-none d-lg-block me-3", style: "height: 900px;" %>
-
-    <div class="text-center">
-      
-      <%= link_to challenges_path, class: "d-block text-decoration-none mx-auto mb-4" do %>
-      <div class="card shadow-sm mx-auto" style="width: 40rem;">
-        <%= image_tag "CHALLENGES.jpg", class: "card-img-top" %>
+    <%= link_to businesses_path, class: "d-block text-decoration-none mx-auto mb-4" do %>
+      <div class="card shadow-sm mx-auto bg-secondary text-white border-0" style="width: 40rem;">
+        <div class="card-body py-5">
+          <h2 class="card-title mb-0 fw-bold">NEGOCIOS</h2>
+        </div>
       </div>
-      <% end %>
+    <% end %>
 
-      <%= link_to progresses_path, class: "d-block text-decoration-none mx-auto mb-4" do %>
-      <div class="card shadow-sm mx-auto" style="width: 40rem;">
-        <%= image_tag "PROGRESSES.jpg", class: "card-img-top" %>
+    <%= link_to items_path, class: "d-block text-decoration-none mx-auto mb-4" do %>
+      <div class="card shadow-sm mx-auto bg-secondary text-white border-0" style="width: 40rem;">
+        <div class="card-body py-5">
+          <h2 class="card-title mb-0 fw-bold">ÍTEMS / MENÚ</h2>
+        </div>
       </div>
-      <% end %>
+    <% end %>
 
-      <%= link_to users_path, class: "d-block text-decoration-none mx-auto mb-4" do %>
-      <div class="card shadow-sm mx-auto" style="width: 40rem;">
-        <%= image_tag "USERS.jpg", class: "card-img-top" %>
+    <%= link_to shopping_carts_path, class: "d-block text-decoration-none mx-auto mb-4" do %>
+      <div class="card shadow-sm mx-auto bg-secondary text-white border-0" style="width: 40rem;">
+        <div class="card-body py-5">
+          <h2 class="card-title mb-0 fw-bold">CARRITOS DE COMPRA</h2>
+        </div>
       </div>
-      <% end %>
-      
-    </div>
-    <%= image_tag "Right.jpeg", class: "d-none d-lg-block ms-3", style: "height: 900px;" %>
-
+    <% end %>
+    
   </div>
   
 </div>
-
