@@ -1,3 +1,4 @@
+ActiveJob::Base.queue_adapter = :inline
 Tagging.destroy_all
 ShoppingCart.destroy_all
 Item.destroy_all
