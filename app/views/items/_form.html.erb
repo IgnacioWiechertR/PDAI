@@ -32,11 +32,63 @@
         <%= f.label :cost, "Precio ($)", class: "form-label fw-bold" %>
         <%= f.number_field :cost, class: "form-control", placeholder: "0.00" %>
       </div>
-      <div class="col-md-6 mb-3">
-        <%= f.label :categories, "Categoría", class: "form-label fw-bold" %>
-        <%= f.text_field :categories, class: "form-control", placeholder: "Ej: Pizza, Italiana" %>
+      <div class="mb-3">
+        <%= f.label :tag_ids, "Categorías del Producto (Puedes elegir varias)", class: "form-label text-white" %>
+        <%= f.collection_select :tag_ids, Tag.all, :id, :name, {}, { multiple: true, class: "form-select bg-dark text-white border-secondary", style: "height: 120px;" } %>
+        <small class="text-muted d-block mt-1">Mantén presionado Ctrl (o Cmd en Mac) para seleccionar más de una.</small>
       </div>
     </div>
+
+    <%# Casilla de verificación del Deal %>
+<div class="form-check mb-3">
+  <%= f.check_box :deal, class: "form-check-input bg-dark border-secondary", id: "deal-checkbox" %>
+  <%= f.label :deal, "🔥 ¡Publicar como un DEAL! (Esta oferta expirará automáticamente al cerrar)", class: "form-check-label text-warning fw-bold" %>
+</div>
+
+<%# Sección condicional: Se muestra/oculta con JS %>
+<div class="mb-4 shadow-sm p-4 rounded bg-dark border border-warning" id="deal-fields-section" style="display: none;">
+  <h5 class="text-warning fw-bold mb-3">⚙️ Configuración del Deal</h5>
+  
+  <div class="row">
+    <%# Campo de Descuento %>
+    <div class="col-md-6 mb-3">
+      <%= f.label :discount_percentage, "Porcentaje de Descuento", class: "form-label text-white fw-bold" %>
+      <%= f.select :discount_percentage, (10..90).step(10).map { |p| ["#{p}% de Descuento", p] }, { prompt: "Selecciona el descuento..." }, { class: "form-select bg-dark text-white border-secondary" } %>
+    </div>
+
+    <%# Campo de Stock Limitado %>
+    <div class="col-md-6 mb-3">
+      <%= f.label :stock, "Cantidad en Stock Disponible", class: "form-label text-white fw-bold" %>
+      <%= f.number_field :stock, min: 1, placeholder: "Ej: 10", class: "form-control bg-dark text-white border-secondary" %>
+      <small class="text-muted d-block mt-1">Unidades totales para esta oferta flash.</small>
+    </div>
+  </div>
+</div>
+
+<%# JavaScript para controlar la aparición mágica de los campos %>
+<script>
+  document.addEventListener("turbo:load", function() {
+    const checkbox = document.getElementById("deal-checkbox");
+    const section = document.getElementById("deal-fields-section");
+
+    if (checkbox && section) {
+      // Función para alternar visibilidad
+      function toggleDealFields() {
+        if (checkbox.checked) {
+          section.style.display = "block";
+        } else {
+          section.style.display = "none";
+        }
+      }
+
+      // Escuchar el cambio de la casilla
+      checkbox.addEventListener("change", toggleDealFields);
+      
+      // Ejecutar al cargar por si estamos editando un Deal existente
+      toggleDealFields();
+    }
+  });
+</script>
 
     <div class="d-grid gap-2 mt-4">
       <%= f.submit "Guardar Producto", class: "btn btn-warning fw-bold py-2 shadow" %>

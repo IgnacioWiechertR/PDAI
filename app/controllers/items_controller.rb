@@ -4,15 +4,17 @@ class ItemsController < ApplicationController
   before_action :set_item, only: %i[ show edit update destroy ]
 
   def index
-    # 2. SEGURIDAD: En vez de Item.all, solo trae los productos de ESTE negocio
-    @items = current_business.items
+    # Bloqueamos el index redirigiendo directo a la tienda del negocio
+    redirect_to business_path(current_business)
   end
 
   def show
+    # Bloqueamos el show redirigiendo directo a la tienda del negocio
+    redirect_to business_path(current_business)
   end
 
   def new
-    # 3. Construye el ítem amarrado al negocio actual
+    # Construye el ítem amarrado al negocio actual
     @item = current_business.items.new
   end
 
@@ -23,7 +25,8 @@ class ItemsController < ApplicationController
     @item = current_business.items.new(item_params)
 
     if @item.save
-      redirect_to items_path, notice: "Producto creado con éxito."
+      # REDIRECCIÓN CAMBIADA: Ahora va a la vista de la tienda
+      redirect_to business_path(current_business), notice: "Producto creado con éxito."
     else
       render :new, status: :unprocessable_entity
     end
@@ -31,7 +34,8 @@ class ItemsController < ApplicationController
 
   def update
     if @item.update(item_params)
-      redirect_to items_path, notice: "Producto actualizado con éxito."
+      # REDIRECCIÓN CAMBIADA: Ahora va a la vista de la tienda
+      redirect_to business_path(current_business), notice: "Producto actualizado con éxito."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -39,22 +43,23 @@ class ItemsController < ApplicationController
 
   def destroy
     @item.destroy
-    redirect_to items_path, notice: "Producto eliminado correctamente.", status: :see_other
+    # REDIRECCIÓN CAMBIADA: Ahora va a la vista de la tienda
+    redirect_to business_path(current_business), notice: "Producto eliminado correctamente.", status: :see_other
   end
 
   private
 
   def set_item
-    # 4. EL ESCUDO DEFINITIVO: Al buscar dentro de 'current_business.items',
-    # si un negocio intenta poner en la URL la ID del producto de otra tienda,
-    # Rails arrojará un error 404 (Not Found) automáticamente por seguridad.
+    # EL ESCUDO DEFINITIVO
     @item = current_business.items.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to items_path, alert: "No tienes autorización "
+    # Si intentan buscar un producto que no es suyo, también los devuelve a su tienda
+    redirect_to business_path(current_business), alert: "No tienes autorización."
   end
 
   def item_params
-  # Agregamos :photo a la lista de permitidos
-    params.require(:item).permit(:name, :description, :cost, :photo, categories: [])
+    permitted = params.require(:item).permit(:name, :description, :cost, :photo, :deal, :discount_percentage, :stock, tag_ids: [])
+    permitted[:tag_ids] = permitted[:tag_ids].compact_blank if permitted[:tag_ids]
+    permitted
   end
 end

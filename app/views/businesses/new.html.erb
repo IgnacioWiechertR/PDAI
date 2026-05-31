@@ -29,13 +29,43 @@
             </div>
 
             <div class="mb-3">
-              <%= f.label :category, "Categoría (ej. Sushi, Italiana, Vegana)", class: "form-label" %>
-              <%= f.text_field :category, class: "form-control" %>
+              <%= f.label :comuna, "Comuna", class: "form-label" %>
+              <%= f.select :comuna, [
+                ["Santiago", "santiago"], ["Cerrillos", "cerrillos"], ["Cerro Navia", "cerro_navia"], 
+                ["Conchalí", "conchalí"], ["El Bosque", "el_bosque"], ["Estación Central", "estación_central"], 
+                ["Huechuraba", "huechuraba"], ["Independencia", "independencia"], ["La Cisterna", "la_cisterna"], 
+                ["La Florida", "la_florida"], ["La Granja", "la_granja"], ["La Pintana", "la_pintana"], 
+                ["La Reina", "la_reina"], ["Las Condes", "las_condes"], ["Lo Barnechea", "lo_barnechea"], 
+                ["Lo Espejo", "lo_espejo"], ["Lo Prado", "lo_prado"], ["Macul", "macul"], 
+                ["Maipú", "maipú"], ["Ñuñoa", "ñuñoa"], ["Pedro Aguirre Cerda", "pedro_aguirre_cerda"], 
+                ["Peñalolén", "peñalolén"], ["Providencia", "providencia"], ["Pudahuel", "pudahuel"], 
+                ["Quilicura", "quilicura"], ["Quinta Normal", "quinta_normal"], ["Recoleta", "recoleta"], 
+                ["Renca", "renca"], ["San Joaquín", "san_joaquín"], ["San Miguel", "san_miguel"], 
+                ["San Ramón", "san_ramón"], ["Vitacura", "vitacura"]
+              ], { prompt: "Selecciona una comuna..." }, { class: "form-select bg-dark text-white border-secondary" } %>
             </div>
 
-            <div class="mb-3">
-              <%= f.label :comuna, "Comuna", class: "form-label" %>
-              <%= f.text_field :comuna, class: "form-control" %>
+            <div class="row mb-3">
+              <div class="col-6">
+                <%= f.label :horario_inicio, "Horario Inicio (Ej: 9)", class: "form-label" %>
+                <%= f.number_field :horario_inicio, class: "form-control" %>
+              </div>
+              <div class="col-6">
+                <%= f.label :horario_termino, "Horario Término (Ej: 18)", class: "form-label" %>
+                <%= f.number_field :horario_termino, class: "form-control" %>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <%= f.label :tag_ids, "Categorías del Negocio (Selecciona una o varias)", class: "form-label d-block mb-2" %>
+              <div class="tags-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; background: #2b3035; padding: 15px; border-radius: 6px; border: 1px solid #495057;">
+                <%= f.collection_check_boxes :tag_ids, Tag.all, :id, :name do |b| %>
+                  <div class="tag-item" style="display: flex; align-items: center; gap: 8px;">
+                    <%= b.check_box class: "form-check-input m-0" %>
+                    <%= b.label class: "form-check-label small", style: "cursor: pointer;" %>
+                  </div>
+                <% end %>
+              </div>
             </div>
 
             <div class="mb-4">

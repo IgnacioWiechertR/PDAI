@@ -1,6 +1,207 @@
-<div class="container mt-5">
+<div class="container mt-5 text-white">
+
+  <% if defined?(user_signed_in?) && user_signed_in? %>
+    
+    <%# ========================================================================= %>
+    <% # CARRUSEL 1: 🔥 DEALS IMPERDIBLES %>
+    <% # ========================================================================= %>
+    <% comercios_con_deals = @businesses.select { |b| b.items.vigentes.where(deal: true).any? } %>
+    
+    <% if comercios_con_deals.any? %>
+      <div class="mb-5 p-4 rounded bg-gradient border border-danger shadow-sm" style="background: linear-gradient(145deg, #1f1111, #121212);">
+        <h2 class="text-white fw-bold mb-1">🔥 ¡DEALS EN TIEMPO REAL!</h2>
+        <p class="text-white small mb-3">Locales liquidando productos con descuentos increíbles antes del cierre.</p>
+        
+        <div class="d-flex overflow-auto pb-3" style="gap: 20px; scroll-snap-type: x mandatory;">
+          <% comercios_con_deals.each do |business| %>
+            <div class="card bg-dark text-white border-danger shadow d-flex flex-column" style="min-width: 340px; flex: 0 0 auto; scroll-snap-align: start;">
+              <div class="card-body d-flex flex-column p-4">
+                
+                <h3 class="card-title fw-bold text-white mb-2"><%= business.username %></h3>
+
+                <div class="mb-2 d-flex flex-wrap align-items-center gap-1">
+                  <span class="badge bg-danger text-white font-monospace text-uppercase">OFERTAS ACTIVAS</span>
+                  <span class="text-white small ms-2">📍 <%= business.comuna.titleize %></span>
+                </div>
+
+                <%# NUEVO: Temporizador dinámico para el cierre %>
+                <div class="mb-3 text-warning small fw-bold class-countdown" data-cierre="<%= business.horario_termino %>">
+                  ⏰ Calculando tiempo restante...
+                </div>
+
+                <hr class="border-secondary my-2">
+
+                <div class="flex-grow-1 mb-4">
+                  <h6 class="text-white text-uppercase small fw-bold mb-2">Deals destacados:</h6>
+                  <ul class="list-unstyled mb-0">
+                    <% business.items.vigentes.where(deal: true).limit(2).each do |item| %>
+                      <li class="text-white small mb-1 text-truncate">
+                        🔥 <strong>[DEAL] <%= item.name %></strong> 
+                        <span class="text-success fw-bold">(-<%= item.discount_percentage %>%)</span>
+                      </li>
+                    <% end %>
+                  </ul>
+                </div>
+
+                <%= link_to "Aprovechar Ofertas ➡️", business_path(business), class: "btn btn-danger text-white w-100 fw-bold mt-auto py-2 shadow-sm" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+
+    <%# ========================================================================= %>
+    <% # CARRUSEL 2: ✨ RECOMENDADO PARA TI (Match de preferencias) %>
+    <% # ========================================================================= %>
+    <% if current_user.tags.any? %>
+      <% locales_preferidos = @businesses.select { |b| (b.tags & current_user.tags).any? } %>
+      
+      <% if locales_preferidos.any? %>
+        <div class="mb-5">
+          <h2 class="text-white fw-bold mb-1">✨ Recomendado para Ti</h2>
+          <p class="text-white small mb-3">Locales que coinciden con tus gustos favoritos.</p>
+          
+          <div class="d-flex overflow-auto pb-3" style="gap: 20px; scroll-snap-type: x mandatory;">
+            <% locales_preferidos.each do |business| %>
+              <div class="card bg-dark text-white border-info shadow d-flex flex-column" style="min-width: 340px; flex: 0 0 auto; scroll-snap-align: start;">
+                <div class="card-body d-flex flex-column p-4">
+                  
+                  <h3 class="card-title fw-bold text-white mb-2"><%= business.username %></h3>
+
+                  <div class="mb-2 d-flex flex-wrap align-items-center gap-1">
+                    <% (business.tags & current_user.tags).first(2).each do |matched_tag| %>
+                      <span class="badge bg-info text-dark font-monospace text-uppercase">Te gusta <%= matched_tag.name %></span>
+                    <% end %>
+                    <span class="text-white small ms-2">📍 <%= business.comuna.titleize %></span>
+                  </div>
+
+                  <%# Temporizador dinámico %>
+                  <div class="mb-3 text-warning small fw-bold class-countdown" data-cierre="<%= business.horario_termino %>">
+                    ⏰ Calculando tiempo restante...
+                  </div>
+
+                  <hr class="border-secondary my-2">
+
+                  <div class="flex-grow-1 mb-4">
+                    <%# Productos Flash Destacados %>
+                    <% flash_items = business.items.vigentes.where(deal: true).limit(2) %>
+                    <% if flash_items.any? %>
+                      <h6 class="text-danger text-uppercase small fw-bold mb-2">⚡ ¡DEALS DISPONIBLES!:</h6>
+                      <ul class="list-unstyled mb-3 border-start border-danger ps-2">
+                        <% flash_items.each do |item| %>
+                          <li class="text-white small mb-1 text-truncate">
+                            🔥 <strong>[DEAL] <%= item.name %></strong> <span class="text-success fw-bold">(-<%= item.discount_percentage %>%)</span>
+                          </li>
+                        <% end %>
+                      </ul>
+                    <% end %>
+
+                    <h6 class="text-white text-uppercase small fw-bold mb-2">Carta Regular:</h6>
+                    <% regular_items = business.items.vigentes.where(deal: [false, nil]).limit(2) %>
+                    <% if regular_items.any? %>
+                      <ul class="list-unstyled mb-0">
+                        <% regular_items.each do |item| %>
+                          <li class="text-white small mb-1 text-truncate">
+                            ✨ <%= item.name %>
+                          </li>
+                        <% end %>
+                      </ul>
+                    <% else %>
+                      <p class="text-white small fst-italic mb-0">Sin productos cargados.</p>
+                    <% end %>
+                  </div>
+
+                  <%= link_to "Ver Menú ➡️", business_path(business), class: "btn btn-info text-dark w-100 fw-bold mt-auto py-2 shadow-sm" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <hr class="border-secondary mb-5">
+      <% end %>
+    <% end %>
+
+
+    <%# ========================================================================= %>
+    <% # CARRUSEL 3: 📍 CERCA DE TI %>
+    <% # ========================================================================= %>
+    <% if current_user.comuna.present? %>
+      <% locales_cercanos = @businesses.select { |b| b.comuna&.downcase == current_user.comuna&.downcase } %>
+      
+      <% if locales_cercanos.any? %>
+        <div class="mb-5">
+          <h2 class="text-white fw-bold mb-1">📍 Cerca de ti <span class="text-warning">(<%= current_user.comuna.titleize %>)</span></h2>
+          <p class="text-white small mb-3">Explora las alternativas culinarias de tu sector.</p>
+          
+          <div class="d-flex overflow-auto pb-3" style="gap: 20px; scroll-snap-type: x mandatory;">
+            <% locales_cercanos.each do |business| %>
+              <div class="card bg-dark text-white border-warning shadow d-flex flex-column" style="min-width: 340px; flex: 0 0 auto; scroll-snap-align: start;">
+                <div class="card-body d-flex flex-column p-4">
+                  
+                  <h3 class="card-title fw-bold text-white mb-2"><%= business.username %></h3>
+
+                  <div class="mb-2 d-flex flex-wrap align-items-center gap-1">
+                    <% business.tags.limit(2).each do |tag| %>
+                      <span class="badge bg-warning text-dark font-monospace text-uppercase"><%= tag.name %></span>
+                    <% end %>
+                  </div>
+
+                  <%# Temporizador dinámico %>
+                  <div class="mb-3 text-warning small fw-bold class-countdown" data-cierre="<%= business.horario_termino %>">
+                    ⏰ Calculando tiempo restante...
+                  </div>
+
+                  <hr class="border-secondary my-2">
+
+                  <div class="flex-grow-1 mb-4">
+                    <%# Productos Flash Destacados %>
+                    <% flash_items = business.items.vigentes.where(deal: true).limit(2) %>
+                    <% if flash_items.any? %>
+                      <h6 class="text-danger text-uppercase small fw-bold mb-2">⚡ ¡DEALS DISPONIBLES!:</h6>
+                      <ul class="list-unstyled mb-3 border-start border-danger ps-2">
+                        <% flash_items.each do |item| %>
+                          <li class="text-white small mb-1 text-truncate">
+                            🔥 <strong>[DEAL] <%= item.name %></strong> <span class="text-success fw-bold">(-<%= item.discount_percentage %>%)</span>
+                          </li>
+                        <% end %>
+                      </ul>
+                    <% end %>
+
+                    <h6 class="text-white text-uppercase small fw-bold mb-2">Menú destacado:</h6>
+                    <% regular_items = business.items.vigentes.where(deal: [false, nil]).limit(2) %>
+                    <% if regular_items.any? %>
+                      <ul class="list-unstyled mb-0">
+                        <% regular_items.each do |item| %>
+                          <li class="text-white small mb-1 text-truncate">
+                            ✨ <%= item.name %> <span class="text-white">(<%= item.cost %>)</span>
+                          </li>
+                        <% end %>
+                      </ul>
+                    <% else %>
+                      <p class="text-white small fst-italic mb-0">Sin productos cargados aún.</p>
+                    <% end %>
+                  </div>
+
+                  <%= link_to "Ver Menú ➡️", business_path(business), class: "btn btn-warning text-dark w-100 fw-bold mt-auto py-2 shadow-sm" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <hr class="border-secondary mb-5">
+      <% end %>
+    <% end %>
+
+  <% end %>
+
+
+  <%# ========================================================================= %>
+  <% # LISTA GENERAL: EXPLORAR TODAS LAS TIENDAS %>
+  <% # ========================================================================= %>
   <div class="mb-5">
-    <h1 class="text-white fw-bold display-5">🏪 Explorar Tiendas</h1>
+    <h1 class="text-white fw-bold display-5">🏪 Explorar Todas las Tiendas</h1>
     <p class="text-white">Encuentra tus locales favoritos y revisa su menú al instante.</p>
   </div>
 
@@ -10,31 +211,44 @@
         <div class="card bg-dark text-white border-secondary h-100 shadow d-flex flex-column">
           <div class="card-body d-flex flex-column p-4">
             
-            <h3 class="card-title fw-bold text-warning mb-2">
+            <h3 class="card-title fw-bold text-white mb-2">
               <%= business.username %>
             </h3>
 
-            <div class="mb-3">
-              <span class="badge bg-warning text-dark me-2 font-monospace text-uppercase">
-                <%= business.category.presence || "Comida" %>
-              </span>
-              <span class="text-white small">📍 <%= business.comuna %></span>
+            <div class="mb-2 d-flex flex-wrap align-items-center gap-1">
+              <% if business.tags.any? %>
+                <% business.tags.limit(3).each do |tag| %>
+                  <span class="badge bg-warning text-dark font-monospace text-uppercase"><%= tag.name %></span>
+                <% end %>
+              <% else %>
+                <span class="badge bg-secondary text-white font-monospace text-uppercase">Comida</span>
+              <% end %>
+              <span class="text-white small ms-2">📍 <%= business.comuna.titleize %></span>
             </div>
 
-            <hr class="border-secondary my-3">
+            <%# Temporizador dinámico para el listado general %>
+            <div class="mb-3 text-warning small fw-bold class-countdown" data-cierre="<%= business.horario_termino %>">
+              ⏰ Calculando tiempo restante...
+            </div>
+
+            <hr class="border-secondary my-2">
 
             <div class="flex-grow-1 mb-4">
               <h6 class="text-white text-uppercase small fw-bold mb-2">Menú destacado:</h6>
               <% if business.items.any? %>
                 <ul class="list-unstyled mb-0">
-                  <% business.items.limit(3).each do |item| %>
-                    <li class="text-light small mb-1">
-                      ✨ <%= item.name %> <span class="text-white">(<%= item.cost %>)</span>
+                  <% business.items.vigentes.limit(3).each do |item| %>
+                    <li class="text-white small mb-1 text-truncate">
+                      <% if item.deal %>
+                        <span class="text-danger fw-bold">🔥 [DEAL]</span> <strong><%= item.name %></strong> <span class="text-success font-monospace fw-bold">(-<%= item.discount_percentage %>%)</span>
+                      <% else %>
+                        ✨ <%= item.name %> <span class="text-white">(<%= item.cost %>)</span>
+                      <% end %>
                     </li>
                   <% end %>
                 </ul>
               <% else %>
-                <p class="text-white small italic mb-0">Sin productos cargados aún.</p>
+                <p class="text-white small fst-italic mb-0">Sin productos cargados aún.</p>
               <% end %>
             </div>
 
@@ -46,3 +260,52 @@
     <% end %>
   </div>
 </div>
+
+<%# ========================================================================= %>
+<% # JAVASCRIPT: SCRIPT MOTOR DEL TEMPORIZADOR EN TIEMPO REAL %>
+<% # ========================================================================= %>
+<script>
+  document.addEventListener("turbo:load", function() {
+    function actualizarTemporizadores() {
+      const ahora = new Date();
+      const horaActual = ahora.getHours();
+      const minActual = ahora.getMinutes();
+      const segActual = ahora.getSeconds();
+
+      document.querySelectorAll(".class-countdown").forEach(function(el) {
+        const horaCierre = parseInt(el.getAttribute("data-cierre"), 10);
+        
+        if (isNaN(horaCierre)) return;
+
+        // Calculamos la diferencia matemática de tiempo en segundos totales
+        let segsTotalesActuales = (horaActual * 3600) + (minActual * 60) + segActual;
+        let segsTotalesCierre = horaCierre * 3600;
+
+        if (segsTotalesCierre > segsTotalesActuales) {
+          let difSegundos = segsTotalesCierre - segsTotalesActuales;
+          
+          let horasRestantes = Math.floor(difSegundos / 3600);
+          let minutosRestantes = Math.floor((difSegundos % 3600) / 60);
+          let segundosRestantes = difSegundos % 60;
+
+          // Formateo con ceros a la izquierda
+          let mStr = minutosRestantes < 10 ? "0" + minutosRestantes : minutosRestantes;
+          let sStr = segundosRestantes < 10 ? "0" + segundosRestantes : segundosRestantes;
+
+          el.innerHTML = `⏰ Cierra en: <span class="text-white font-monospace">${horasRestantes}h ${mStr}m ${sStr}s</span>`;
+        } else {
+          el.innerHTML = `🚫 <span class="text-danger fw-bold">¡TIENDA CERRADA!</span>`;
+        }
+      });
+    }
+
+    // Ejecuta de inmediato y luego cada 1 segundo exacto
+    actualizarTemporizadores();
+    const intervalId = setInterval(actualizarTemporizadores, 1000);
+
+    // Evita la acumulación de intervalos al navegar con Turbo Rails
+    document.addEventListener("turbo:before-cache", function() {
+      clearInterval(intervalId);
+    }, { once: true });
+  });
+</script>

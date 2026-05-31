@@ -1,12 +1,31 @@
-<div class="container mt-5">
+<div class="container mt-5 text-white">
+  <%# --- HEADER DEL NEGOCIO (Tags, Comuna, Horarios y Temporizador) --- %>
   <div class="card bg-dark text-white border-warning p-4 mb-5 shadow">
     <div class="row align-items-center">
       <div class="col-md-8">
         <h1 class="display-4 fw-bold text-warning mb-2">🏪 <%= @business.username %></h1>
-        <p class="lead mb-1">
-          <span class="badge bg-warning text-dark me-2 text-uppercase"><%= @business.category.presence || "Comida" %></span>
-          📍 Ubicados en: <strong><%= @business.comuna %></strong>
-        </p>
+        <div class="lead mb-1 d-flex flex-wrap align-items-center gap-1">
+          <% if @business.tags.any? %>
+            <% @business.tags.limit(3).each do |tag| %>
+              <span class="badge bg-warning text-dark text-uppercase"><%= tag.name %></span>
+            <% end %>
+          <% else %>
+            <span class="badge bg-warning text-dark text-uppercase">Local</span>
+          <% end %>
+          
+          <span class="text-white ms-2">📍 Ubicados en: <strong class="text-white"><%= @business.comuna.titleize %></strong></span>
+          
+          <% if @business.horario_inicio.present? && @business.horario_termino.present? %>
+            <span class="text-warning ms-3 me-3">
+              ⏰ Horario: <strong class="text-warning"><%= sprintf('%02d:00', @business.horario_inicio) %> - <%= sprintf('%02d:00', @business.horario_termino) %> hrs</strong>
+            </span>
+            
+            <%# NUEVO: Temporizador dinámico en tiempo real en la cabecera del Show %>
+            <span class="fw-bold class-countdown text-warning fs-5 d-inline-block ms-md-2" data-cierre="<%= @business.horario_termino %>">
+              ⏰ Calculando tiempo restante...
+            </span>
+          <% end %>
+        </div>
       </div>
       
       <% if business_signed_in? && current_business == @business %>
@@ -18,58 +37,196 @@
     </div>
   </div>
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-white fw-bold mb-0">Nuestros Productos</h2>
+  <%# --- SECCIÓN 1: 🔥 DEALS EXCLUSIVOS (Vigentes y con Stock) --- %>
+  <% deals_actuales = @business.items.vigentes.where(deal: true) %>
+  <% if deals_actuales.any? %>
+    <div class="mb-5 p-4 rounded bg-gradient" style="background: linear-gradient(145deg, #2b1f00, #121212); border: 2px dashed #ffc107;">
+      <h2 class="text-warning fw-bold mb-3">⚡ ¡DEALS EN TIEMPO REAL! ⚡</h2>
+      <p class="text-white small mb-4">Aprovecha antes de que cierre la tienda o se agote el stock. Estas ofertas desaparecerán automáticamente.</p>
+      
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <% deals_actuales.each do |item| %>
+          <div class="col">
+            <div class="card bg-dark text-white h-100 border-warning shadow d-flex flex-column position-relative">
+              
+              <%# Badges Flotantes %>
+              <div class="position-absolute top-0 start-0 m-3 d-flex gap-1" style="z-index: 10;">
+                <span class="badge bg-danger text-white fw-bold px-3 py-2 shadow text-uppercase">🔥 DEAL</span>
+                <% if item.discount_percentage.present? %>
+                  <span class="badge bg-warning text-dark fw-bold px-2 py-2 shadow">-<%= item.discount_percentage %>%</span>
+                <% end %>
+              </div>
+
+              <%# Badge de Stock Flotante %>
+              <div class="position-absolute top-0 end-0 m-3" style="z-index: 10;">
+                <% if item.stock.to_i > 0 %>
+                  <span class="badge bg-secondary text-white fw-bold">Quedan: <%= item.stock %> unids</span>
+                <% else %>
+                  <span class="badge bg-dark text-danger border border-danger fw-bold">¡AGOTADO!</span>
+                <% end %>
+              </div>
+              
+              <% if item.photo.attached? %>
+                <%= image_tag item.photo, class: "card-img-top #{'opacity-50' if item.stock.to_i <= 0}", style: "height: 180px; object-fit: cover;" %>
+              <% end %>
+
+              <div class="card-body d-flex flex-column p-4 pt-5">
+                <h4 class="card-title fw-bold text-white mb-2 <%= 'text-decoration-line-through opacity-50' if item.stock.to_i <= 0 %>">
+                  🔥 [DEAL] <%= item.name %>
+                </h4>
+                
+                <div class="mb-2">
+                  <% if item.discount_percentage.present? %>
+                    <span class="text-decoration-line-through text-white opacity-50 small me-2">$<%= item.cost %></span>
+                    <span class="fs-4 fw-bold text-success">$<%= (item.cost * (1 - item.discount_percentage.to_f / 100)).round %></span>
+                  <% else %>
+                    <span class="fs-4 fw-bold text-white">$<%= item.cost %></span>
+                  <% end %>
+                </div>
+
+                <p class="card-text flex-grow-1 text-white small"><%= item.description %></p>
+                
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                  <% if user_signed_in? %>
+                    <% if item.stock.to_i > 0 %>
+                      <%= button_to "Agregar 🛒", add_item_to_cart_path(item_id: item.id), method: :post, class: "btn btn-danger btn-sm fw-bold shadow-sm" %>
+                    <% else %>
+                      <button class="btn btn-secondary btn-sm fw-bold disabled" disabled>Agotado 🚫</button>
+                    <% end %>
+                  <% end %>
+
+                  <% if business_signed_in? && current_business == @business %>
+                    <div class="btn-group">
+                      <%= link_to "✏️", edit_item_path(item), class: "btn btn-outline-light btn-sm px-2" %>
+                      <%= button_to "🗑️", item_path(item), method: :delete, data: { turbo_confirm: "¿Eliminar este producto?" }, class: "btn btn-outline-danger btn-sm px-2 d-inline" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+
+  <%# --- TITULAR Y BOTÓN DE AGREGAR PRODUCTOS NORMALES --- %>
+  <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+    <h2 class="text-white fw-bold mb-0">Nuestros Productos Regulares</h2>
     <% if business_signed_in? && current_business == @business %>
       <%= link_to "➕ Subir Nuevo Producto", new_item_path, class: "btn btn-warning fw-bold shadow-sm" %>
     <% end %>
   </div>
 
-  <% if @business.items.any? %>
-    <div class="row row-cols-1 row-cols-md-3 g-4"> <% @business.items.each do |item| %>
-        <div class="col">
-          <div class="card bg-secondary text-white h-100 border-0 shadow-sm d-flex flex-column">
-            
-            <% if item.photo.attached? %>
-              <%= image_tag item.photo, class: "card-img-top", style: "height: 180px; object-fit: cover;" %>
-            <% end %>
+  <%# --- SECCIÓN 2: PRODUCTOS REGULARES AGRUPADOS POR TAGS --- %>
+  <% productos_regulares = @business.items.vigentes.where(deal: [false, nil]) %>
 
-            <div class="card-body d-flex flex-column p-4">
-              <h4 class="card-title fw-bold text-warning mb-2"><%= item.name %></h4>
-              <p class="card-text flex-grow-1 text-light small opacity-75"><%= item.description %></p>
-              
-              <div class="d-flex justify-content-between align-items-center mt-4">
-                <span class="fs-4 fw-bold text-white">$<%= item.cost %></span>
+  <% if productos_regulares.any? %>
+    <% productos_agrupados = productos_regulares.group_by { |item| item.tags.first&.name || "Otros" } %>
+
+    <% productos_agrupados.each do |nombre_tag, items| %>
+      <%# Título de la Categoría %>
+      <div class="mb-4 mt-4 border-bottom border-secondary pb-2">
+        <h3 class="text-warning fw-bold text-uppercase fs-4 mb-0">⬇️ <%= nombre_tag %></h3>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <% items.each do |item| %>
+          <div class="col">
+            <div class="card bg-secondary text-white h-100 border-0 shadow-sm d-flex flex-column">
+              <% if item.photo.attached? %>
+                <%= image_tag item.photo, class: "card-img-top", style: "height: 180px; object-fit: cover;" %>
+              <% end %>
+
+              <div class="card-body d-flex flex-column p-4">
+                <h4 class="card-title fw-bold text-white mb-2">
+                  <% if item.deal %>
+                    <span class="text-danger fw-bold">🔥 [DEAL]</span>
+                  <% end %>
+                  <%= item.name %>
+                </h4>
                 
-                <% if user_signed_in? %>
-                  <%= button_to "Agregar 🛒", add_item_to_cart_path(item_id: item.id), method: :post, class: "btn btn-warning btn-sm fw-bold shadow-sm" %>
-                <% end %>
+                <p class="card-text flex-grow-1 text-white small"><%= item.description %></p>
+                
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                  <span class="fs-4 fw-bold text-white">$<%= item.cost %></span>
+                  
+                  <% if user_signed_in? %>
+                    <%= button_to "Agregar 🛒", add_item_to_cart_path(item_id: item.id), method: :post, class: "btn btn-warning btn-sm fw-bold shadow-sm" %>
+                  <% end %>
 
-                <% if business_signed_in? && current_business == @business %>
-                  <div class="btn-group">
-                    <%= link_to "✏️", edit_item_path(item), class: "btn btn-outline-light btn-sm px-2" %>
-                    <%= button_to "🗑️", item_path(item), method: :delete, data: { turbo_confirm: "¿Eliminar este producto?" }, class: "btn btn-outline-danger btn-sm px-2 d-inline" %>
-                  </div>
-                <% end %>
+                  <% if business_signed_in? && current_business == @business %>
+                    <div class="btn-group">
+                      <%= link_to "✏️", edit_item_path(item), class: "btn btn-outline-light btn-sm px-2" %>
+                      <%= button_to "🗑️", item_path(item), method: :delete, data: { turbo_confirm: "¿Eliminar este producto?" }, class: "btn btn-outline-danger btn-sm px-2 d-inline" %>
+                    </div>
+                  <% end %>
+                </div>
               </div>
-
             </div>
           </div>
-        </div>
-      <% end %>
-    </div>
-  <% else %>
+        <% end %>
+      </div>
+    <% end %>
+
+  <% elsif deals_actuales.empty? %>
     <div class="alert alert-secondary bg-dark text-white border-0 text-center p-5">
-      <h3>Esta tienda aún no tiene productos disponibles.</h3>
-      <% if business_signed_in? && current_business == @business %>
-        <p class="text-muted">¡Haz clic en el botón de arriba para publicar tu primer producto!</p>
-      <% else %>
-        <p class="text-muted">¡Vuelve más tarde para revisar su catálogo!</p>
-      <% end %>
+      <h3 class="text-white">Esta tienda aún no tiene productos disponibles.</h3>
     </div>
   <% end %>
 
-  <div class="mt-4 mb-5">
-    <%= link_to "← Volver a Tiendas", businesses_path, class: "text-muted text-decoration-none" %>
+  <div class="mt-5 mb-5">
+    <%= link_to "← Volver a Tiendas", businesses_path, class: "text-white text-decoration-none" %>
   </div>
 </div>
+
+<%# ========================================================================= %>
+<% # JAVASCRIPT: MOTOR DEL TEMPORIZADOR EN TIEMPO REAL PARA EL SHOW %>
+<% # ========================================================================= %>
+<script>
+  document.addEventListener("turbo:load", function() {
+    function actualizarTemporizadores() {
+      const ahora = new Date();
+      const horaActual = ahora.getHours();
+      const minActual = ahora.getMinutes();
+      const segActual = ahora.getSeconds();
+
+      document.querySelectorAll(".class-countdown").forEach(function(el) {
+        const horaCierre = parseInt(el.getAttribute("data-cierre"), 10);
+        
+        if (isNaN(horaCierre)) return;
+
+        // Calculamos la diferencia matemática de tiempo en segundos totales
+        let segsTotalesActuales = (horaActual * 3600) + (minActual * 60) + segActual;
+        let segsTotalesCierre = horaCierre * 3600;
+
+        if (segsTotalesCierre > segsTotalesActuales) {
+          let difSegundos = segsTotalesCierre - segsTotalesActuales;
+          
+          let horasRestantes = Math.floor(difSegundos / 3600);
+          let minutosRestantes = Math.floor((difSegundos % 3600) / 60);
+          let segundosRestantes = difSegundos % 60;
+
+          // Formateo con ceros a la izquierda
+          let mStr = minutosRestantes < 10 ? "0" + minutosRestantes : minutosRestantes;
+          let sStr = segundosRestantes < 10 ? "0" + segundosRestantes : segundosRestantes;
+
+          el.innerHTML = `⏰ Cierra en: <span class="text-white font-monospace">${horasRestantes}h ${mStr}m ${sStr}s</span>`;
+        } else {
+          el.innerHTML = `🚫 <span class="text-danger fw-bold">¡TIENDA CERRADA!</span>`;
+        }
+      });
+    }
+
+    // Ejecuta de inmediato y luego cada 1 segundo exacto
+    actualizarTemporizadores();
+    const intervalId = setInterval(actualizarTemporizadores, 1000);
+
+    // Evita la acumulación de intervalos al navegar con Turbo Rails
+    document.addEventListener("turbo:before-cache", function() {
+      clearInterval(intervalId);
+    }, { once: true });
+  });
+</script>

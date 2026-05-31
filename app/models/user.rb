@@ -3,6 +3,8 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_one :shopping_cart, dependent: :destroy
+  has_many :taggings, as: :taggable, dependent: :destroy
+  has_many :tags, through: :taggings
 
   # Esto asegura que apenas se registre, se cree su carrito vacío:
   after_create :create_automatic_shopping_cart

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_30_213137) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_31_172655) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -54,6 +54,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_30_213137) do
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
+    t.integer "horario_inicio"
+    t.integer "horario_termino"
     t.index ["email"], name: "index_businesses_on_email", unique: true
     t.index ["reset_password_token"], name: "index_businesses_on_reset_password_token", unique: true
   end
@@ -89,6 +91,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_30_213137) do
     t.bigint "owner_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "deal"
+    t.integer "discount_percentage"
+    t.integer "stock"
     t.index ["owner_id"], name: "index_items_on_owner_id"
   end
 
@@ -108,6 +113,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_30_213137) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_shopping_carts_on_user_id"
+  end
+
+  create_table "taggings", force: :cascade do |t|
+    t.bigint "tag_id", null: false
+    t.string "taggable_type", null: false
+    t.bigint "taggable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tag_id"], name: "index_taggings_on_tag_id"
+    t.index ["taggable_type", "taggable_id"], name: "index_taggings_on_taggable"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
@@ -134,4 +155,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_30_213137) do
   add_foreign_key "progresses", "challenges"
   add_foreign_key "progresses", "users"
   add_foreign_key "shopping_carts", "users"
+  add_foreign_key "taggings", "tags"
 end

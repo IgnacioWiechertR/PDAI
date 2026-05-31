@@ -2,7 +2,6 @@ class UsersController < ApplicationController
   before_action :authenticate_user!, only: %i[new create edit update destroy]
   before_action :set_user, only: %i[ show edit update destroy ]
 
-
   # GET /users or /users.json
   def index
     @users = User.all
@@ -65,8 +64,7 @@ class UsersController < ApplicationController
       @user = User.find(params.expect(:id))
     end
 
-    # Only allow a list of trusted parameters through.
     def user_params
-      params.expect(user: [ :username, :email, :password, :role, :badges ])
+      params.expect(user: [ :username, :email, :password, :age, :comuna, tag_ids: [] ])
     end
 end

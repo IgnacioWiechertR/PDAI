@@ -25,7 +25,7 @@ class BusinessesController < ApplicationController
 
     respond_to do |format|
       if @business.save
-        # ¡ESTA ES LA LÍNEA MÁGICA DE DEVISE!
+        # ¡Línea mágica de Devise!
         sign_in(@business)
         
         format.html { redirect_to root_path, notice: "¡Negocio registrado y sesión iniciada con éxito!" }
@@ -66,8 +66,8 @@ class BusinessesController < ApplicationController
       @business = Business.find(params.expect(:id))
     end
 
-    # Only allow a list of trusted parameters through.
+    # AJUSTADO: Quitamos :category e incluimos los horarios y los tag_ids
     def business_params
-      params.require(:business).permit(:username, :comuna, :email, :password, :category)
+      params.expect(business: [ :username, :comuna, :email, :password, :horario_inicio, :horario_termino, tag_ids: [] ])
     end
 end

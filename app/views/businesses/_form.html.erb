@@ -1,9 +1,8 @@
 <%= form_with(model: business) do |form| %>
   <% if business.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(business.errors.count, "error") %> prohibited this business from being saved:</h2>
-
-      <ul>
+    <div class="alert alert-danger" role="alert" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+      <h4 class="alert-heading"><%= pluralize(business.errors.count, "error") %> prohibieron guardar este negocio:</h4>
+      <ul class="mb-0">
         <% business.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,27 +10,52 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :username, style: "display: block" %>
-    <%= form.text_field :username %>
+  <div class="mb-3">
+    <%= form.label :username, "Nombre del Negocio", class: "form-label text-white d-block mb-1" %>
+    <%= form.text_field :username, class: "form-control w-100 p-2 rounded border-0" %>
   </div>
 
-  <div>
-    <%= form.label :comuna, style: "display: block" %>
-    <%= form.text_field :comuna %>
+  <div class="mb-3">
+    <%= form.label :email, "Correo Electrónico", class: "form-label text-white d-block mb-1" %>
+    <%= form.email_field :email, class: "form-control w-100 p-2 rounded border-0" %>
   </div>
 
-  <div>
-    <%= form.label :email, style: "display: block" %>
-    <%= form.text_field :email %>
+  <div class="mb-3">
+    <%= form.label :comuna, "Comuna", class: "form-label text-white d-block mb-1" %>
+    <%= form.text_field :comuna, class: "form-control w-100 p-2 rounded border-0" %>
   </div>
 
-  <div>
-    <%= form.label :category, style: "display: block" %>
-    <%= form.text_field :category %>
+  <%# NUEVOS CAMPOS: Horarios exigidos por tu base de datos y Seeds %>
+  <div class="row mb-3" style="display: flex; gap: 15px;">
+    <div style="flex: 1;">
+      <%= form.label :horario_inicio, "Horario de Inicio (Ej: 9)", class: "form-label text-white d-block mb-1" %>
+      <%= form.number_field :horario_inicio, class: "form-control w-100 p-2 rounded border-0" %>
+    </div>
+    <div style="flex: 1;">
+      <%= form.label :horario_termino, "Horario de Término (Ej: 18)", class: "form-label text-white d-block mb-1" %>
+      <%= form.number_field :horario_termino, class: "form-control w-100 p-2 rounded border-0" %>
+    </div>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <div class="mb-3">
+    <%= form.label :password, "Contraseña", class: "form-label text-white d-block mb-1" %>
+    <%= form.password_field :password, class: "form-control w-100 p-2 rounded border-0" %>
+  </div>
+
+  <%# AQUÍ CAMBIAMOS EL INPUT LIBRE POR LOS CHECKBOXES DE LAS CATEGORÍAS REALES %>
+  <div class="mb-4">
+    <%= form.label :tag_ids, "Categorías del Negocio (Selecciona una o varias)", class: "form-label text-white d-block mb-2" %>
+    <div class="tags-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; background: #222; padding: 15px; border-radius: 5px; border: 1px solid #444;">
+      <%= form.collection_check_boxes :tag_ids, Tag.all, :id, :name do |b| %>
+        <div class="tag-item" style="display: flex; align-items: center; gap: 8px; color: white;">
+          <%= b.check_box %>
+          <%= b.label style: "margin-bottom: 0; cursor: pointer;" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <%= form.submit "Crear Negocio", class: "btn w-100 p-2 rounded border-0", style: "background-color: #ffc107; color: black; font-weight: bold; cursor: pointer;" %>
   </div>
 <% end %>
