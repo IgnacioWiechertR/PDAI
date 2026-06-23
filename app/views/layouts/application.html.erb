@@ -16,6 +16,23 @@
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+    
+    <style>
+      body, .bg-dark, .card.bg-dark {
+        background-color: #2e2014 !important;
+      }
+
+      .text-white, 
+      .navbar-dark .nav-link, 
+      .navbar-dark .navbar-text, 
+      .navbar-dark .navbar-brand {
+        color: #f1e6d7 !important;
+      }
+
+      .border-secondary {
+        border-color: rgba(241, 230, 215, 0.2) !important;
+      }
+    </style>
   </head>
 
   <body class="bg-dark text-white"> 
